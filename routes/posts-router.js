@@ -70,4 +70,15 @@ postsRouter.post('/:id/comments', (req, res) => {
     });
 });
 
+postsRouter.get('/:id/comments', (req, res) => {
+  const { id } = req.params;
+  db.findPostComments(id)
+    .then(comments => {
+      res.send(comments);
+    })
+    .catch(error => {
+      res.sendStatus(500);
+    });
+});
+
 module.exports = postsRouter;
