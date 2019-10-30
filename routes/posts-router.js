@@ -2,7 +2,17 @@ const postsRouter = require('express').Router();
 const db = require('../data/db.js');
 
 postsRouter.get('/', (req, res) => {
-  res.send('/api/posts is working');
+  db.find()
+    .then(posts => {
+      res.send(posts);
+    })
+    .catch(error => {
+      res
+        .send(500)
+        .json({
+          errorMessage: 'Could not retrieve posts from the database :('
+        });
+    });
 });
 
 // create a new post
