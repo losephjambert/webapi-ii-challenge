@@ -48,11 +48,9 @@ postsRouter.post('/', (req, res) => {
           res.status(201).send(post);
         })
         .catch(error => {
-          res
-            .status(500)
-            .send({
-              error: 'There was an error while saving the post to the database'
-            });
+          res.status(500).send({
+            error: 'There was an error while saving the post to the database'
+          });
         });
     })
     .catch(postError => {
@@ -110,19 +108,44 @@ postsRouter.post('/:id/comments', (req, res) => {
   const { text } = req.body;
   const { id } = req.params;
   if (!text) {
-    res.send({
-      errorMessage: 'Please provide text for the comment.'
-    });
+    res
+      .status(400)
+      .send({ message: 'The post with the specified ID does not exist.' });
+  } else {
+    db.findById(id)
+      .then(post => {
+        if (post.length === 0) {
+          res.status(404).send({
+            message: 'The post with the specified ID does not exist.'
+          });
+        } else {
+          db.insertComment({ text, post_id: id })
+            .then(commentResponse => {
+              db.findCommentById(commentResponse.id)
+                .then(comment => {
+                  res.status(201).json(comment);
+                })
+                .catch(error => {
+                  res.status(500).send({
+                    error:
+                      'There was an error while retrieving the comment to the database'
+                  });
+                });
+            })
+            .catch(postError => {
+              res.status(500).send({
+                error:
+                  'There was an error while saving the comment to the database'
+              });
+            });
+        }
+      })
+      .catch(error => {
+        res
+          .status(500)
+          .send({ message: 'error retrieving post from the database' });
+      });
   }
-
-  db.insertComment({ text, post_id: id })
-    .then(commentResponse => {
-      console.log(commentResponse);
-      res.status(200).json({ commentResponse });
-    })
-    .catch(postError => {
-      console.log(postError);
-    });
 });
 
 // get comments by post id
