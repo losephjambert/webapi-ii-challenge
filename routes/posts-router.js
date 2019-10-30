@@ -66,6 +66,25 @@ postsRouter.delete('/:id', (req, res) => {
     });
 });
 
+// update post by id
+postsRouter.put('/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.update(id, req.body)
+    .then(updatedPost => {
+      if (updatedPost) {
+        db.findById(id)
+          .then(post => res.send(post))
+          .catch(error => res.sendStatus(500));
+      } else {
+        res.sendStatus(404);
+      }
+    })
+    .catch(error => {
+      res.sendStatus(500);
+    });
+});
+
 // add a new comment to a post
 postsRouter.post('/:id/comments', (req, res) => {
   const { text } = req.body;
