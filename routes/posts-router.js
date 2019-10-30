@@ -50,6 +50,22 @@ postsRouter.post('/', (req, res) => {
     });
 });
 
+// delete post by id
+postsRouter.delete('/:id', (req, res) => {
+  const { id } = req.params;
+  db.remove(id)
+    .then(removedPost => {
+      if (removedPost) {
+        res.send({ id });
+      } else {
+        res.sendStatus(404);
+      }
+    })
+    .catch(error => {
+      res.sendStatus(500);
+    });
+});
+
 // add a new comment to a post
 postsRouter.post('/:id/comments', (req, res) => {
   const { text } = req.body;
@@ -70,6 +86,7 @@ postsRouter.post('/:id/comments', (req, res) => {
     });
 });
 
+// get comments by post id
 postsRouter.get('/:id/comments', (req, res) => {
   const { id } = req.params;
   db.findPostComments(id)
