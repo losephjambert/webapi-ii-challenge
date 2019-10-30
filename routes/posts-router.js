@@ -1,17 +1,33 @@
 const postsRouter = require('express').Router();
 const db = require('../data/db.js');
 
+// get all posts
 postsRouter.get('/', (req, res) => {
   db.find()
     .then(posts => {
       res.send(posts);
     })
     .catch(error => {
-      res
-        .send(500)
-        .json({
-          errorMessage: 'Could not retrieve posts from the database :('
-        });
+      res.send(500).json({
+        errorMessage: 'Could not retrieve posts from the database :('
+      });
+    });
+});
+
+// get post by id
+postsRouter.get('/:id', (req, res) => {
+  const { id } = req.params;
+  db.findById(id)
+    .then(post => {
+      if (post.length === 0) {
+        res.sendStatus(404);
+      } else {
+        res.send(post);
+      }
+    })
+    .catch(error => {
+      res.sendStatus(500);
+      console.log(error);
     });
 });
 
