@@ -53,12 +53,22 @@ postsRouter.post('/', (req, res) => {
 // delete post by id
 postsRouter.delete('/:id', (req, res) => {
   const { id } = req.params;
-  db.remove(id)
-    .then(removedPost => {
-      if (removedPost) {
-        res.send({ id });
-      } else {
+  db.findById(id)
+    .then(post => {
+      if (post.length === 0) {
         res.sendStatus(404);
+      } else {
+        db.remove(id)
+          .then(removedPost => {
+            if (removedPost) {
+              res.send(post);
+            } else {
+              res.sendStatus(404);
+            }
+          })
+          .catch(error => {
+            res.sendStatus(500);
+          });
       }
     })
     .catch(error => {
