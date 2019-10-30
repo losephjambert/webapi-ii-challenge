@@ -35,7 +35,7 @@ postsRouter.get('/:id', (req, res) => {
 postsRouter.post('/', (req, res) => {
   const { title, contents } = req.body;
   if (!title || !contents) {
-    res.send({
+    res.status(400).send({
       errorMessage: 'Please provide title and contents for the post.'
     });
   }
@@ -43,7 +43,17 @@ postsRouter.post('/', (req, res) => {
   db.insert({ title, contents })
     .then(postResponse => {
       console.log(postResponse);
-      res.status(200).json({ postResponse });
+      db.findById(postResponse.id)
+        .then(post => {
+          res.status(201).send(post);
+        })
+        .catch(error => {
+          res
+            .status(500)
+            .send({
+              error: 'There was an error while saving the post to the database'
+            });
+        });
     })
     .catch(postError => {
       console.log(postError);
