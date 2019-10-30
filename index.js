@@ -1,4 +1,5 @@
 const express = require('express');
+const postsRouter = require('./routes/posts-router.js');
 
 const app = express();
 app.use(express.json());
@@ -8,11 +9,13 @@ app.get('/', (request, response) => {
   <h1>Web API II Challenge</h1>
   <h2>Available Routes</h2>
   <ul>
-    <li>/</li>
+    <li>/ <code>GET</code></li>
   </ul>
 `;
-  res.send(rootResponse);
+  response.send(rootResponse);
 });
+
+app.use('/api/posts', postsRouter);
 
 const PORT = 5000;
 app.listen(PORT, () => {
