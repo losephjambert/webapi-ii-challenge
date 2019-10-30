@@ -20,13 +20,17 @@ postsRouter.get('/:id', (req, res) => {
   db.findById(id)
     .then(post => {
       if (post.length === 0) {
-        res.sendStatus(404);
+        res
+          .status(404)
+          .send({ message: 'The post with the specified ID does not exist.' });
       } else {
         res.send(post);
       }
     })
     .catch(error => {
-      res.sendStatus(500);
+      res
+        .status(500)
+        .send({ error: 'The post information could not be retrieved.' });
       console.log(error);
     });
 });
@@ -151,13 +155,25 @@ postsRouter.post('/:id/comments', (req, res) => {
 // get comments by post id
 postsRouter.get('/:id/comments', (req, res) => {
   const { id } = req.params;
-  db.findPostComments(id)
-    .then(comments => {
-      res.send(comments);
-    })
-    .catch(error => {
-      res.sendStatus(500);
-    });
+  db.findById(id).then(post => {
+    if (post) {
+      db.findPostComments(id)
+        .then(comments => {
+          res.send(comments);
+        })
+        .catch(error => {
+          res
+            .status(500)
+            .send({
+              error: 'The comments information could not be retrieved.'
+            });
+        });
+    } else {
+      res
+        .status(404)
+        .send({ message: 'The post with the specified ID does not exist.' });
+    }
+  });
 });
 
 module.exports = postsRouter;
